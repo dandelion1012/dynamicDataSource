@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:util="http://www.springframework.org/schema/util" xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd 
+	http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd
+	http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd
+	http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+	
+	<bean id="dataSource" class="org.apache.tomcat.dbcp.dbcp.BasicDataSource" destroy-method="close"
+	p:driverClassName="com.mysql.jdbc.Driver" 
+	p:url="jdbc:mysql://localhost:3306/ddsmaindb?useUnicode=true&amp;characterEncoding=utf-8" 
+	p:username="root" 
+	p:password="60f0ab7be5" />
+	<bean id="dataSourceFactory" class="com.dds.imple.DefaultDataSourceFactory"
+		p:sqlFileDir="WEB-INF/conf/sqls">
+		<property name="dbProps">
+			<util:properties location="classpath:../conf/dataSourceProps.properties" />
+		</property>
+	</bean>
+	<bean id="dsLookup" class="com.dds.imple.DynamicDataSourceLookup"  
+		p:dataSourceFactory-ref="dataSourceFactory">
+		<property name="jdbcTemplate">
+			<bean class="org.springframework.jdbc.core.JdbcTemplate" 
+						p:dataSource-ref="dataSource" />
+		</property>
+	</bean>
+	 
+	<bean id="dds" class="com.dds.imple.DynamicDataSource"
+	p:dataSourceLookup-ref="dsLookup" />
+	
+	<bean id="jdbcTemplate"  class="org.springframework.jdbc.core.JdbcTemplate" 
+		p:dataSource-ref="dds" />
+</beans>
